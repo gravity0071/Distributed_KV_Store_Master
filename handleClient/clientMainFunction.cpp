@@ -1,7 +1,6 @@
 //
 // Created by Shawn Wan on 2024/11/6.
 //
-
 #include "clientMainFunction.h"
 #include "../util/Server.h"
 #include <thread>
@@ -11,15 +10,6 @@
 #include <string>
 #include <utility>
 
-//todo: just to test the jsonParser function, need to be deleted
-std::map<std::string, std::string> createMap() {
-    return {
-            {"1", "apple"},
-            {"2", "banana"},
-            {"3", "cherry"}
-    };
-}
-
 void ClientThread::operator()() {
     connectToClient();
 }
@@ -27,20 +17,32 @@ void ClientThread::operator()() {
 // Function to handle communication with a single client
 //todo implement the corresponding function here, using kvStore & consistentMap to achieve the corresponding function
 void ClientThread::handleClient(int client_socket) {
-    std::string message = jsonParser.MapToJson(createMap());
-    send(client_socket, message.c_str(), message.size(), 0);
-
-
+    //recieve the client's json data, store in buffer
     char buffer[1024] = {0};
     int bytes_read = recv(client_socket, buffer, 1024, 0);
     if (bytes_read > 0) {
         std::cout << "Received from client: " << buffer << std::endl;
     }
 
+    //the main function of the first step of query: client query master for the destination of the store server
+    std::map clientLookUpMap = jsonParser.JsonToMap(buffer);
+    std::string key = "NULL";
+    if (clientLookUpMap.find("operation") != clientLookUpMap.end() ||
+            clientLookUpMap.find("key") != clientLookUpMap.end()) {
+        key = clientLookUpMap["key"];
+    } else {
+        std::cout << "Key 'operation' not found in map." << std::endl;
+        //todo: may need to return fail to client
+    }
+
+    //send the ACK/NACK to client
+    send(client_socket, key.c_str(), key.size(), 0);
+
     close(client_socket);  // Close the client socket after communication
     std::cout << "Closed connection with client" << std::endl;
 }
 
+// initiate multiple threads to multiple clients
 void ClientThread::connectToClient() {
     Server server(PORT);
 
