@@ -5,6 +5,10 @@
 #include <map>
 #include <shared_mutex>
 #include "HashCalculator.h"
+#define HASH_KEY_RANGE 10000
+
+// key range:0 - 10000
+// should be assigned like: [0 - 10001)
 
 class ConsistentHashingMap {
 private:
@@ -17,7 +21,7 @@ private:
 
 public:
     // Constructor: Allows configuration of hash range
-    explicit ConsistentHashingMap(size_t hashRange = 10000) : hashCalculator(hashRange) {}
+    explicit ConsistentHashingMap(size_t hashRange = HASH_KEY_RANGE) : hashCalculator(hashRange) {}
 
     // Find the store_id responsible for a given key
     std::string findParticularKey(const std::string& key) const;
@@ -26,6 +30,7 @@ public:
     int removeRange(const std::string& oldRange, const std::string& newRange);
 
     // Add a new store and assign it to a new range
+    //if the map is empty, return the whole key range
     int addNew(const std::string& oldRange, const std::string& newRange, const std::string& storeId);
 
     // Debug: Display the entire hash ring

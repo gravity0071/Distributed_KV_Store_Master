@@ -46,7 +46,13 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 # Add test executable for ClientThread and other tests
-add_executable(KVStoreMapTest ${TEST_SOURCES} ${UTIL_SOURCES} ${CLIENT_SOURCES} ${HEART_SOURCES} ${COMMAND_SOURCES})
+add_executable(KVStoreMapTest
+        ${TEST_SOURCES}
+        ${UTIL_SOURCES}
+        ${CLIENT_SOURCES}
+        ${HEART_SOURCES}
+        ${COMMAND_SOURCES}
+        )
 
 # Link GoogleTest and GoogleMock libraries
 target_link_libraries(KVStoreMapTest gtest_main gmock_main nlohmann_json::nlohmann_json)
