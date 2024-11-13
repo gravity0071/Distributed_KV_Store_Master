@@ -4,8 +4,7 @@
 #include "../util/KVStoreMap.h"
 #include "../util/ConsistentHashingMap.h"
 #include "../util/JsonParser.h"
-
-#define PORT 8080
+#define CLIENT_PORT 8080
 
 
 class ClientThread {

@@ -1,22 +1,35 @@
-//
-// Created by Shawn Wan on 2024/11/6.
-//
-#ifndef CONSISTENT_HASHING_MAP_H
-#define CONSISTENT_HASHING_MAP_H
+#ifndef DISTRIBUTED_KV_STORE_MASTER_CONSISTENTHASHINGMAP_H
+#define DISTRIBUTED_KV_STORE_MASTER_CONSISTENTHASHINGMAP_H
 
-#include <unordered_map>
 #include <string>
+#include <map>
 #include <shared_mutex>
-#include <iostream>
+#include "HashCalculator.h"
 
 class ConsistentHashingMap {
 private:
-    std::unordered_map<int, std::string> map;
-    mutable std::shared_mutex mutex;
+    std::map<std::string, std::string> hashMap; // key: "start-end", value: store_id
+    mutable std::shared_mutex mutex;           // Shared mutex for thread safety
+    HashCalculator hashCalculator;             // Hash calculator instance
+
+    // Helper function to parse range keys
+    bool parseRange(const std::string& rangeKey, size_t& start, size_t& end) const;
 
 public:
-    void write(int key, const std::string& value);
-    std::string read(int key) const;
+    // Constructor: Allows configuration of hash range
+    explicit ConsistentHashingMap(size_t hashRange = 10000) : hashCalculator(hashRange) {}
+
+    // Find the store_id responsible for a given key
+    std::string findParticularKey(const std::string& key) const;
+
+    // Remove an old range and assign it to a new range
+    int removeRange(const std::string& oldRange, const std::string& newRange);
+
+    // Add a new store and assign it to a new range
+    int addNew(const std::string& oldRange, const std::string& newRange, const std::string& storeId);
+
+    // Debug: Display the entire hash ring
+    void displayHashRing() const;
 };
 
-#endif // CONSISTENT_HASHING_MAP_H
+#endif // DISTRIBUTED_KV_STORE_MASTER_CONSISTENTHASHINGMAP_H

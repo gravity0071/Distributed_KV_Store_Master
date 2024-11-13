@@ -19,10 +19,10 @@ int main() {
     ClientThread clientThread(kvStore, consistentMap, jsonParser);
 
     //8081
-    //
-    //
-    HeartbeatThread heartbeatThread(consistentMap);
-    CommandThread commandThread(kvStore, consistentMap, sharedVector); //8082
+    HeartbeatThread heartbeatThread(kvStore, consistentMap, jsonParser, sharedVector);
+
+    // 8082
+    CommandThread commandThread(kvStore, consistentMap, jsonParser, sharedVector); //8082
 
     std::thread client(clientThread);
     std::thread heartbeat(heartbeatThread);

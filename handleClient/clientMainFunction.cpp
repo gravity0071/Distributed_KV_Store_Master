@@ -44,7 +44,7 @@ void ClientThread::handleClient(int client_socket) {
 
 // initiate multiple threads to multiple clients
 void ClientThread::connectToClient() {
-    Server server(PORT);
+    Server server(CLIENT_PORT);
 
     // Initialize the server
     if (!server.initialize()) {
@@ -78,5 +78,3 @@ void ClientThread::connectToClient() {
     // Close the server when done (though in this loop, it runs indefinitely)
     server.closeServer();
 }
-
-

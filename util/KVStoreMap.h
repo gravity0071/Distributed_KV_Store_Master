@@ -1,13 +1,10 @@
-//
-// Created by Shawn Wan on 2024/11/6.
-//
 #ifndef KV_STORE_MAP_H
 #define KV_STORE_MAP_H
 
 #include <unordered_map>
 #include <string>
 #include <optional>
-#include <mutex>
+#include <shared_mutex> // Use shared_mutex for concurrent reads
 #include "JsonParser.h"
 /*
 Key: store_id
@@ -26,7 +23,7 @@ Value:
 class KVStoreMap {
 private:
     std::unordered_map<std::string, std::string> store;
-    mutable std::mutex mutex;
+    mutable std::shared_mutex sharedMutex; // Use shared_mutex for shared and exclusive locks
     JsonParser jsonParser;
 
     // Internal helper function to update a specific field in the JSON data
@@ -59,6 +56,5 @@ public:
                       const std::string& addDropPort, const std::string& clientPort, const std::string& status,
                       const std::string& keyNum, const std::string& keyRange);
 };
-
 
 #endif // KV_STORE_MAP_H

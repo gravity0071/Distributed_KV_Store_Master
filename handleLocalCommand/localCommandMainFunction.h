@@ -4,22 +4,22 @@
 #include "../util/KVStoreMap.h"
 #include "../util/ConsistentHashingMap.h"
 #include "../util/SharedStringVector.h"
+#define COMMAND_PORT 8082
 
 class CommandThread {
 private:
     KVStoreMap& kvStore;
     ConsistentHashingMap& consistentMap;
     SharedStringVector& sharedVector;
+    JsonParser& jsonParser;
 
 public:
-    CommandThread(KVStoreMap& kvStore, ConsistentHashingMap& consistentMap, SharedStringVector& sharedVector)
-            : kvStore(kvStore), consistentMap(consistentMap), sharedVector(sharedVector) {}
+    CommandThread(KVStoreMap& kvStore, ConsistentHashingMap& consistentMap, JsonParser& jsonParser, SharedStringVector& sharedVector)
+            : kvStore(kvStore), consistentMap(consistentMap), jsonParser(jsonParser), sharedVector(sharedVector) {}
 
-    void operator()() {
-        kvStore.write("command_key", "command_value");
-        consistentMap.write(2, "command_data");
-        sharedVector.add("Command processed");
-    }
+    void operator()();
+    void acceptServerConnections();
+    void handleServer(int command_socket);
 };
 
 #endif // COMMAND_THREAD_H

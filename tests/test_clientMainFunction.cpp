@@ -28,7 +28,7 @@ protected:
     // Set up server in a separate thread
     void SetUp() override {
         serverThread = std::thread([this]() {
-            Server server(PORT);
+            Server server(CLIENT_PORT);
             if (server.initialize()) {
                 while (true) {
                     int client_socket = server.acceptConnection();
@@ -55,7 +55,8 @@ protected:
 
         struct sockaddr_in server_address {};
         server_address.sin_family = AF_INET;
-        server_address.sin_port = htons(PORT);
+        server_address.sin_port = htons(CLIENT_PORT);
+
         server_address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
         // Connect to server

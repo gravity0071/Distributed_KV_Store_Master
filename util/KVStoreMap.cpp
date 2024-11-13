@@ -1,32 +1,28 @@
-//
-// Created by Shawn Wan on 2024/11/6.
-//
-// KVStoreMap.cpp
-
 #include "KVStoreMap.h"
 #include <iostream>
 #include <map>
+#include <shared_mutex>
 
 // Function to write a key-value pair to the store
 void KVStoreMap::write(const std::string& key, const std::string& value) {
-    std::unique_lock lock(mutex);  // Exclusive lock for writing
+    std::unique_lock<std::shared_mutex> lock(sharedMutex); // Exclusive lock for writing
     store[key] = value;
     std::cout << "KVStoreMap: Wrote " << key << " = " << value << std::endl;
 }
 
 // Function to read a value based on a key from the store
 std::optional<std::string> KVStoreMap::read(const std::string& key) const {
-    std::unique_lock lock(mutex);  // Exclusive lock for reading
+    std::shared_lock<std::shared_mutex> lock(sharedMutex); // Shared lock for reading
     auto it = store.find(key);
     if (it != store.end()) {
         return it->second;
     }
-    return std::nullopt;  // Indicate the key was not found
+    return std::nullopt; // Indicate the key was not found
 }
 
 // Internal helper function to update a specific field in the JSON data
 void KVStoreMap::updateField(const std::string& key, const std::string& field, const std::string& value) {
-    std::unique_lock lock(mutex);
+    std::unique_lock<std::shared_mutex> lock(sharedMutex); // Exclusive lock for modifying the map
     auto it = store.find(key);
 
     std::map<std::string, std::string> jsonData;
@@ -39,20 +35,22 @@ void KVStoreMap::updateField(const std::string& key, const std::string& field, c
 
 // Getter function to retrieve the IP address associated with a key
 std::string KVStoreMap::getIp(const std::string& key) const {
+    std::shared_lock<std::shared_mutex> lock(sharedMutex); // Shared lock for reading
     auto data = read(key);
     if (!data.has_value()) {
-        return "";  // Or handle the missing key case as needed
+        return ""; // Or handle the missing key case as needed
     }
 
     auto jsonData = jsonParser.JsonToMap(data.value());
     if (jsonData.find("ip") != jsonData.end()) {
         return jsonData["ip"];
     }
-    return "";  // Return an empty string if "ip" key does not exist
+    return ""; // Return an empty string if "ip" key does not exist
 }
 
 // Getter function for the heartbeat port associated with a key
 std::string KVStoreMap::getHeartbeatPort(const std::string& key) const {
+    std::shared_lock<std::shared_mutex> lock(sharedMutex); // Shared lock for reading
     auto data = read(key);
     if (!data.has_value()) return "";
 
@@ -65,6 +63,7 @@ std::string KVStoreMap::getHeartbeatPort(const std::string& key) const {
 
 // Getter function for the add/drop port associated with a key
 std::string KVStoreMap::getAddDropPort(const std::string& key) const {
+    std::shared_lock<std::shared_mutex> lock(sharedMutex); // Shared lock for reading
     auto data = read(key);
     if (!data.has_value()) return "";
 
@@ -77,6 +76,7 @@ std::string KVStoreMap::getAddDropPort(const std::string& key) const {
 
 // Getter function for the client port associated with a key
 std::string KVStoreMap::getClientPort(const std::string& key) const {
+    std::shared_lock<std::shared_mutex> lock(sharedMutex); // Shared lock for reading
     auto data = read(key);
     if (!data.has_value()) return "";
 
@@ -89,6 +89,7 @@ std::string KVStoreMap::getClientPort(const std::string& key) const {
 
 // Getter function to check the store status associated with a key
 std::string KVStoreMap::getStoreStatus(const std::string& key) const {
+    std::shared_lock<std::shared_mutex> lock(sharedMutex); // Shared lock for reading
     auto data = read(key);
     if (!data.has_value()) return "";
 
@@ -101,6 +102,7 @@ std::string KVStoreMap::getStoreStatus(const std::string& key) const {
 
 // Getter function for the number of keys in the store associated with a key
 std::string KVStoreMap::getStoreKeyNum(const std::string& key) const {
+    std::shared_lock<std::shared_mutex> lock(sharedMutex); // Shared lock for reading
     auto data = read(key);
     if (!data.has_value()) return "";
 
@@ -113,6 +115,7 @@ std::string KVStoreMap::getStoreKeyNum(const std::string& key) const {
 
 // Getter function for the key range associated with a key
 std::string KVStoreMap::getKeyRange(const std::string& key) const {
+    std::shared_lock<std::shared_mutex> lock(sharedMutex); // Shared lock for reading
     auto data = read(key);
     if (!data.has_value()) return "";
 
@@ -123,6 +126,7 @@ std::string KVStoreMap::getKeyRange(const std::string& key) const {
     return "";
 }
 
+// Setter function implementations using updateField
 void KVStoreMap::setIp(const std::string& key, const std::string& ip) {
     updateField(key, "ip", ip);
 }
@@ -151,13 +155,12 @@ void KVStoreMap::setKeyRange(const std::string& key, const std::string& keyRange
     updateField(key, "keyRange", keyRange);
 }
 
-// Implementation of the setAllFields function
+// Function to set all fields at once
 void KVStoreMap::setAllFields(const std::string& key, const std::string& ip, const std::string& heartbeatPort,
                               const std::string& addDropPort, const std::string& clientPort, const std::string& status,
                               const std::string& keyNum, const std::string& keyRange) {
-    std::unique_lock lock(mutex);
+    std::unique_lock<std::shared_mutex> lock(sharedMutex); // Exclusive lock for writing
 
-    // Create an ordered map for JSON fields to maintain consistent order
     std::map<std::string, std::string> jsonData;
     jsonData["ip"] = ip;
     jsonData["heartbeatPort"] = heartbeatPort;
@@ -167,6 +170,5 @@ void KVStoreMap::setAllFields(const std::string& key, const std::string& ip, con
     jsonData["keyNum"] = keyNum;
     jsonData["keyRange"] = keyRange;
 
-    // Write the JSON string directly to the store
     store[key] = jsonParser.MapToJson(jsonData);
 }
