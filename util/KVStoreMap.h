@@ -60,7 +60,7 @@ public:
     // Function to set all fields at once
     void setAllFields(const std::string& key, const std::string& ip, const std::string& heartbeatPort,
                       const std::string& addDropPort, const std::string& clientPort, const std::string& status,
-                      const std::string& keyNum, const std::string& keyRange);
+                      const std::string& keyNum, const std::string& keyRange, const std::leftStoreId, const std::rightStoreId);
 
     void displayAllData() const;
 };
