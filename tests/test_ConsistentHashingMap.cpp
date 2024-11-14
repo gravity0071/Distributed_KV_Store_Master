@@ -56,3 +56,17 @@ TEST_F(ConsistentHashingMapTest, ConcurrentOperations) {
     // Verify the final state of the hash ring
     hashMap.displayHashRing();
 }
+
+TEST_F(ConsistentHashingMapTest, TestWrappedSituation) {
+    std::cout<<"add store_1"<<hashMap.addNew("0-10001", "0-5000", "store_1")<<std::endl;
+    std::cout<<"add store_4"<<hashMap.addNew("0-10001", "7500-10001", "store_4")<<std::endl;
+    std::cout<<"add store_3"<<hashMap.addNew("0-7500", "5000-7500", "store_3")<<std::endl;
+    std::cout<<"add store_2"<<hashMap.addNew("0-5000", "0-2500", "store_2")<<std::endl;
+
+    std::cout<<"remove range: "<<hashMap.removeRange("7500-10001","0-2500")<<std::endl;
+    std::cout<<"remove range: "<<hashMap.removeRange("7500-2500","2500-5000")<<std::endl;
+
+    std::cout<<"add store_2"<<hashMap.addNew("7500-5000", "7500-1000", "store_2")<<std::endl;
+
+    hashMap.displayHashRing();
+}

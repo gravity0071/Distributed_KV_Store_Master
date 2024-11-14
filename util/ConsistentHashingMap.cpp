@@ -138,6 +138,6 @@ void ConsistentHashingMap::displayHashRing() const {
 
     std::cout << "Hash Ring:" << std::endl;
     for (const auto &[rangeKey, storeId] : hashMap) {
-        std::cout << "Range: " << rangeKey << " -> Store ID: " << storeId << std::endl;
+        std::cout << "Key range: " << rangeKey << " -> Store Id: " << storeId << std::endl;
     }
 }

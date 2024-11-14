@@ -16,13 +16,15 @@ Value:
   "clientPort":"",
   "alive":"true"/"false",
   ¡°keyNum":""£¬
-  ¡°keyRange": ""
+  ¡°keyRange": "",
+  "leftStoreId": "",
+  "rightStoreId": ""
 }
  */
 
 class KVStoreMap {
 private:
-    std::unordered_map<std::string, std::string> store;
+    std::map<std::string, std::string> store;
     mutable std::shared_mutex sharedMutex; // Use shared_mutex for shared and exclusive locks
     JsonParser jsonParser;
 
@@ -41,6 +43,8 @@ public:
     std::string getStoreStatus(const std::string& key) const;
     std::string getStoreKeyNum(const std::string& key) const;
     std::string getKeyRange(const std::string& key) const;
+    std::string getLeftStoreId(const std::string& key) const;
+    std::string getRightStoreId(const std::string& key) const;
 
     // Setter functions to update individual fields in the JSON structure
     void setIp(const std::string& key, const std::string& ip);
@@ -50,11 +54,15 @@ public:
     void setStoreStatus(const std::string& key, const std::string& status);
     void setStoreKeyNum(const std::string& key, const std::string& keyNum);
     void setKeyRange(const std::string& key, const std::string& keyRange);
+    void setLeftStoreId(const std::string& key, const std::string& leftStore);
+    void setRightStoreId(const std::string& key, const std::string& rigthStore);
 
     // Function to set all fields at once
     void setAllFields(const std::string& key, const std::string& ip, const std::string& heartbeatPort,
                       const std::string& addDropPort, const std::string& clientPort, const std::string& status,
                       const std::string& keyNum, const std::string& keyRange);
+
+    void displayAllData() const;
 };
 
 #endif // KV_STORE_MAP_H

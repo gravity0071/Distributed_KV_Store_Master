@@ -88,3 +88,20 @@ TEST_F(KVStoreMapConsistencyTest, IncreasedConcurrentSetOperations) {
     EXPECT_TRUE(kvStore.getStoreKeyNum(key) == keyNumValue1 || kvStore.getStoreKeyNum(key) == keyNumValue2);
     EXPECT_TRUE(kvStore.getKeyRange(key) == keyRangeValue1 || kvStore.getKeyRange(key) == keyRangeValue2);
 }
+
+TEST_F(KVStoreMapConsistencyTest, TestAdd) {
+    kvStore.setIp("store_1", "127.0.0.1");
+    kvStore.setIp("store_2", "127.0.0.2");
+    kvStore.setHeartbeatPort("store_1", "8080");
+    kvStore.setAddDropPort("store_1", "8081");
+    kvStore.setClientPort("store_1", "8082");
+    kvStore.setStoreStatus("store_1", "1");
+    kvStore.setStoreKeyNum("store_1", "100");
+    kvStore.setKeyRange("store_1", "0-5000");
+    kvStore.setLeftStoreId("store_1", "store_2");
+    kvStore.setRightStoreId("store_1", "store_3");
+    kvStore.displayAllData();
+    std::cout << kvStore.getLeftStoreId("store_1") << std::endl;
+    std::cout << kvStore.getRightStoreId("store_1") << std::endl;
+    EXPECT_TRUE(true);
+}

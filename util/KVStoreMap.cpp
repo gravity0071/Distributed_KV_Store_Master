@@ -126,6 +126,30 @@ std::string KVStoreMap::getKeyRange(const std::string& key) const {
     return "";
 }
 
+std::string KVStoreMap::getLeftStoreId(const std::string& key) const {
+    std::shared_lock<std::shared_mutex> lock(sharedMutex); // Shared lock for reading
+    auto data = read(key);
+    if (!data.has_value()) return "";
+
+    auto jsonData = jsonParser.JsonToMap(data.value());
+    if (jsonData.find("leftStoreId") != jsonData.end()) {
+        return jsonData["leftStoreId"];
+    }
+    return "";
+}
+
+std::string KVStoreMap::getRightStoreId(const std::string& key) const {
+    std::shared_lock<std::shared_mutex> lock(sharedMutex); // Shared lock for reading
+    auto data = read(key);
+    if (!data.has_value()) return "";
+
+    auto jsonData = jsonParser.JsonToMap(data.value());
+    if (jsonData.find("rightStoreId") != jsonData.end()) {
+        return jsonData["rightStoreId"];
+    }
+    return "";
+}
+
 // Setter function implementations using updateField
 void KVStoreMap::setIp(const std::string& key, const std::string& ip) {
     updateField(key, "ip", ip);
@@ -155,6 +179,13 @@ void KVStoreMap::setKeyRange(const std::string& key, const std::string& keyRange
     updateField(key, "keyRange", keyRange);
 }
 
+void KVStoreMap::setLeftStoreId(const std::string& key, const std::string& keyRange) {
+    updateField(key, "leftStoreId", keyRange);
+}
+void KVStoreMap::setRightStoreId(const std::string& key, const std::string& keyRange) {
+    updateField(key, "rightStoreId", keyRange);
+}
+
 // Function to set all fields at once
 void KVStoreMap::setAllFields(const std::string& key, const std::string& ip, const std::string& heartbeatPort,
                               const std::string& addDropPort, const std::string& clientPort, const std::string& status,
@@ -171,4 +202,13 @@ void KVStoreMap::setAllFields(const std::string& key, const std::string& ip, con
     jsonData["keyRange"] = keyRange;
 
     store[key] = jsonParser.MapToJson(jsonData);
+}
+
+void KVStoreMap::displayAllData() const {
+    std::shared_lock lock(sharedMutex); // Shared lock for reading
+
+    std::cout << "display kv store map:" << std::endl;
+    for (const auto &[Key, val] : store) {
+        std::cout << "key: " << Key << " -> Store Data: " << val << std::endl;
+    }
 }

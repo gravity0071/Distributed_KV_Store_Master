@@ -57,4 +57,12 @@ add_executable(KVStoreMapTest
 # Link GoogleTest and GoogleMock libraries
 target_link_libraries(KVStoreMapTest gtest_main gmock_main nlohmann_json::nlohmann_json)
 
-add_test(NAME KVStoreMapTest COMMAND KVStoreMapTest)
+foreach(TEST_SOURCE ${TEST_SOURCES})
+    get_filename_component(TEST_NAME ${TEST_SOURCE} NAME_WE)
+
+    add_executable(${TEST_NAME} ${TEST_SOURCE} ${UTIL_SOURCES} ${CLIENT_SOURCES} ${HEART_SOURCES} ${COMMAND_SOURCES})
+
+    target_link_libraries(${TEST_NAME} PRIVATE gtest_main gmock_main nlohmann_json::nlohmann_json)
+
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+endforeach()
