@@ -37,7 +37,7 @@ void HeartbeatThread::handleServer(int heartbeat_socket) {
         buffer[bytes_read] = '\0'; // Null-terminate the buffer to safely print as a string
 
         // Print the received data
-//        std::cout << "Received from client: " << buffer << std::endl;
+        std::cout << "Received from client: " << buffer << std::endl;
     }
 
     std::cout << "Stopped handling client connection.\n";
