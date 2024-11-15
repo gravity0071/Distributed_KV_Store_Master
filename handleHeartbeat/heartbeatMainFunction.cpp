@@ -16,20 +16,31 @@ void HeartbeatThread::operator()() {
 
 //todo: implement the corresponding function here, using kvStore & consistentMap to achieve the corresponding function
 void HeartbeatThread::handleServer(int heartbeat_socket) {
-    // Receive the client's JSON data, stored in buffer
-//    char buffer[1024] = {0};
-//    int bytes_read = recv(heartbeat_socket, buffer, sizeof(buffer) - 1, 0); // Leave space for null termination
-//    std::cout << "handling" << std::endl;
+    char buffer[1024]; // Buffer to hold the received data
 
-//    std::string it = kvStore.getIp("1");
-//    std::cout << it << std::endl;
+    // Loop to continuously receive and process messages
+    while (true) {
+        memset(buffer, 0, sizeof(buffer)); // Clear the buffer for each new message
 
-//todo: use recv() to receive message from the servers, use send() to send message to the kv servers
-    // Send the ACK/NACK to client
-//    send(heartbeat_socket, it.c_str(), it.size(), 0);
+        int bytes_read = recv(heartbeat_socket, buffer, sizeof(buffer) - 1, 0); // Leave space for null termination
 
-    close(heartbeat_socket); // Close the client socket after communication
-//    std::cout << "Closed connection with client" <<std::endl;
+        if (bytes_read < 0) {
+            // Handle error in receiving data
+            perror("Error reading from socket");
+            break; // Exit the loop on error
+        } else if (bytes_read == 0) {
+            // Handle client disconnect
+            std::cout << "Client disconnected.\n";
+            break; // Exit the loop on disconnect
+        }
+
+        buffer[bytes_read] = '\0'; // Null-terminate the buffer to safely print as a string
+
+        // Print the received data
+//        std::cout << "Received from client: " << buffer << std::endl;
+    }
+
+    std::cout << "Stopped handling client connection.\n";
 }
 
 void HeartbeatThread::acceptServerConnections() {

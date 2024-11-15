@@ -40,7 +40,8 @@ bool Server::initialize() {
         return false;
     }
 
-    std::cout << "Server is listening on port " << port_ << std::endl;
+//    std::cout << "Server is listening on port " << port_ << std::endl;
+//    std::cout << port_  <<std::endl;
     return true;
 }
 

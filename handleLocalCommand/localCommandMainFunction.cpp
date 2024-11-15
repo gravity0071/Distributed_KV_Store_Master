@@ -12,52 +12,44 @@
 #include <utility>
 
 void CommandThread::operator()() {
-    acceptServerConnections();
+    if (initConnection() == -1) {
+        return; // Exit if connection fails
+    }
+    handleServer();
 }
 
-void CommandThread::handleServer(int command_socket) {
+int CommandThread::initConnection() {
+    // Initialize connection to the server
+    migratingStoreSocket1 = tcpConnectionUtility.connectToServer("127.0.0.1", 8084);
+    if (migratingStoreSocket1 < 0) {
+        perror("Socket creation failed");
+        return -1;
+    }
+    return 0;
+}
+
+void CommandThread::handleServer() {
     char buffer[1024] = {0};
 
-    kvStore.setIp("1", "1");
-    kvStore.setIp("1", "2");
-
-    close(command_socket); // Close the client socket
-    std::cout << "Closed connection with client" << std::endl;
-}
-
-void CommandThread::acceptServerConnections() {
-    Server server(COMMAND_PORT);
-
-    // Initialize the server
-    if (!server.initialize()) {
-        std::cerr << "Server initialization failed." << std::endl;
-        return;
-    }
-
-    std::vector<std::thread> command_threads;
-
     while (true) {
-        // Accept a new client connection
-        int command_socket = server.acceptConnection();
-        if (command_socket < 0) {
-            std::cerr << "Failed to accept client connection." << std::endl;
-            continue;
+        // Read input from the user
+        std::cout << "Enter command: ";
+        std::cin.getline(buffer, sizeof(buffer));
+
+        // Send the command to the server
+        if (send(migratingStoreSocket1, buffer, strlen(buffer), 0) < 0) {
+            perror("Failed to send command");
+            break; // Exit loop on send failure
         }
 
-        std::cout << "Accepted new client connection." << std::endl;
-
-        // Spawn a new thread to handle the client
-        command_threads.emplace_back(&CommandThread::handleServer, this,
-                                     command_socket); // Corrected to &ClientThread::handleClient
-    }
-
-    // Join all client threads (optional, depending on whether you want to wait for all threads to finish)
-    for (auto &t: command_threads) {
-        if (t.joinable()) {
-            t.join();
+        // Exit loop if the user enters "close"
+        if (std::string(buffer) == "close") {
+            std::cout << "Exiting...\n";
+            break;
         }
     }
 
-    // Close the server when done (though in this loop, it runs indefinitely)
-    server.closeServer();
+    // Clean up socket
+    close(migratingStoreSocket1);
+    migratingStoreSocket1 = -1;
 }

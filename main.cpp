@@ -28,12 +28,9 @@ int main() {
     std::thread heartbeat(heartbeatThread);
     std::thread command(commandThread);
 
+    std::cout<<"master running" << std::endl;
     client.join();
     heartbeat.join();
     command.join();
-
-//    std::cout << kvStore.read("client_key") << std::endl;
-//    std::cout << consistentMap.read(1) << std::endl;
-
     return 0;
 }

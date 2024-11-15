@@ -189,7 +189,7 @@ void KVStoreMap::setRightStoreId(const std::string& key, const std::string& keyR
 // Function to set all fields at once
 void KVStoreMap::setAllFields(const std::string& key, const std::string& ip, const std::string& heartbeatPort,
                               const std::string& addDropPort, const std::string& clientPort, const std::string& status,
-                              const std::string& keyNum, const std::string& keyRange, const std::leftStoreId, const std::rightStoreId) {
+                              const std::string& keyNum, const std::string& keyRange, const std::string& leftStoreId, const std::string& rightStoreId) {
     std::unique_lock<std::shared_mutex> lock(sharedMutex); // Exclusive lock for writing
 
     std::map<std::string, std::string> jsonData;
