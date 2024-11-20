@@ -5,7 +5,7 @@
 #include <memory>
 #include <map>
 #include <string>
-#include <utility>
+#include <optional>
 #include <unistd.h> // for close()
 
 void ClientThread::operator()() {
@@ -15,6 +15,11 @@ void ClientThread::operator()() {
 // 处理单个客户端请求，支持多次查询
 void ClientThread::handleClient(int clientSocket) {
     while (true) {
+        // 测试
+        kvStore.setAllFields("store1", "127.0.0.1", "8001", "8002", "8085", "true", "100", "0-10000", "store0", "store2");
+        kvStore.setAllFields("store2", "127.0.0.1", "8001", "8002", "8085", "true", "50", "10000-20000", "store1", "store3");
+        kvStore.setAllFields("store3", "127.0.0.1", "8001", "8002", "8085", "false", "30", "20000-30000", "store2", "store1");
+        //
         char buffer[1024] = {0};
         int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
         if (bytesRead <= 0) {
@@ -41,17 +46,29 @@ void ClientThread::handleClient(int clientSocket) {
             // 查询 key 对应的 storeId
             std::string storeId = consistentMap.findParticularKey(key);
             if (!storeId.empty()) {
-                // 模拟从存储节点获取值（在实际应用中，这里可以查询存储节点）
-                std::string value = "Value_For_" + key; // 模拟的查询值
+                // 检查 store 是否存活
+                std::string storeStatus = kvStore.getStoreStatus(storeId);
+                if (storeStatus == "true") {
+                    // 构造响应信息，返回存储节点的 IP 和 Port
+                    std::string ip = kvStore.getIp(storeId);
+                    std::string port = kvStore.getClientPort(storeId);
 
-                // 构造 JSON 响应
-                std::string jsonResponse = jsonParser.MapToJson({
-                                                                        {"store_id", storeId},
-                                                                        {"key", key},
-                                                                        {"value", value} // 返回查询的值
-                                                                });
-                send(clientSocket, jsonResponse.c_str(), jsonResponse.size(), 0);
-                std::cout << "Sent response to client: " << jsonResponse << std::endl;
+                    std::string jsonResponse = jsonParser.MapToJson({
+                                                                            {"store_id", storeId},
+                                                                            {"key", key},
+                                                                            {"ip", ip},
+                                                                            {"port", port}
+                                                                    });
+                    send(clientSocket, jsonResponse.c_str(), jsonResponse.size(), 0);
+                    std::cout << "Sent response to client: " << jsonResponse << std::endl;
+                } else {
+                    // 返回存储节点不可用的错误
+                    std::string errorResponse = jsonParser.MapToJson({
+                                                                             {"error", "Store is not alive"},
+                                                                             {"store_id", storeId}
+                                                                     });
+                    send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
+                }
             } else {
                 // 如果未找到 key，则返回错误
                 std::string errorResponse = jsonParser.MapToJson({{"error", "Key not found"}});
@@ -116,4 +133,3 @@ void initializeHashMap(ConsistentHashingMap& consistentMap) {
     consistentMap.addNew("10000-20000", "10000-20000", "store2");
     consistentMap.addNew("20000-65536", "20000-65536", "store3");
 }
-
