@@ -20,7 +20,7 @@ void CommandThread::operator()() {
 
 int CommandThread::initConnection() {
     // Initialize connection to the server
-    migratingStoreSocket1 = tcpConnectionUtility.connectToServer("127.0.0.1", 8084);
+    migratingStoreSocket1 = tcpConnectionUtility.connectToServer("127.0.0.1", 8085);
     if (migratingStoreSocket1 < 0) {
         perror("Socket creation failed");
         return -1;

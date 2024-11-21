@@ -52,7 +52,7 @@ add_executable(KVStoreMapTest
         ${CLIENT_SOURCES}
         ${HEART_SOURCES}
         ${COMMAND_SOURCES}
-        )
+)
 
 # Link GoogleTest and GoogleMock libraries
 target_link_libraries(KVStoreMapTest gtest_main gmock_main nlohmann_json::nlohmann_json)
