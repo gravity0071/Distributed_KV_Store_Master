@@ -34,6 +34,7 @@ private:
 public:
     void write(const std::string& key, const std::string& value);
     std::optional<std::string> read(const std::string& key) const;
+    int size();
 
     // Getter functions for various fields in the JSON structure
     std::string getIp(const std::string& key) const;
@@ -63,5 +64,7 @@ public:
                       const std::string& keyNum, const std::string& keyRange, const std::string & leftStoreId, const std::string & rightStoreId);
 
     void displayAllData() const;
+    void displayAllKeys() const;
+    bool haveKey(std::string& val) const;
 };
 #endif

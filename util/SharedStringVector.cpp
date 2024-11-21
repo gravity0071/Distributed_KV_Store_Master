@@ -14,3 +14,26 @@ std::vector<std::string> SharedStringVector::getAll() const {
     std::shared_lock lock(mutex);
     return vec;
 }
+
+bool SharedStringVector::have(const std::string& val){
+    std::shared_lock lock(mutex);
+    auto it = std::find(vec.begin(), vec.end(), val);
+    if(it != vec.end())
+        return true;
+    else
+        return false;
+}
+
+
+bool SharedStringVector::remove(const std::string& value) {
+    std::unique_lock lock(mutex);
+    auto it = std::find(vec.begin(), vec.end(), value);
+    if (it != vec.end()) {
+        vec.erase(it); // Remove the element if found
+        std::cout << "SharedStringVector: Removed " << value << std::endl;
+        return true;
+    } else {
+        std::cout << "SharedStringVector: Value " << value << " not found" << std::endl;
+        return false;
+    }
+}

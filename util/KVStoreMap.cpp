@@ -3,6 +3,10 @@
 #include <map>
 #include <shared_mutex>
 
+int KVStoreMap::size(){
+    return store.size();
+}
+
 // Function to write a key-value pair to the store
 void KVStoreMap::write(const std::string& key, const std::string& value) {
     std::unique_lock<std::shared_mutex> lock(sharedMutex); // Exclusive lock for writing
@@ -207,10 +211,28 @@ void KVStoreMap::setAllFields(const std::string& key, const std::string& ip, con
 }
 
 void KVStoreMap::displayAllData() const {
-    std::shared_lock lock(sharedMutex); // Shared lock for reading
+    std::shared_lock lock(sharedMutex);
 
     std::cout << "display kv store map:" << std::endl;
     for (const auto &[Key, val] : store) {
         std::cout << "key: " << Key << " -> Store Data: " << val << std::endl;
     }
+}
+
+void KVStoreMap::displayAllKeys() const{
+    std::shared_lock lock(sharedMutex);
+    std::cout << "Servers: ";
+    for (const auto &[Key, val] : store) {
+        std::cout << Key << ", ";
+    }
+    std::cout << std::endl;
+}
+
+bool KVStoreMap::haveKey(std::string& val) const{
+    std::shared_lock lock(sharedMutex);
+
+    auto it = store.find(val);
+    if(it != store.end())
+        return true;
+    return false;
 }
