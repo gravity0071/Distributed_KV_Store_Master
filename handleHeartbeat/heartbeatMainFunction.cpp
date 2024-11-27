@@ -9,8 +9,11 @@
 #include <map>
 #include <string>
 #include <utility>
+#define HEARTBEAT_TIMEOUT 5 // 心跳超时时间（秒）
+#define MONITOR_INTERVAL 2 // 监控线程检查间隔（秒）
 
 void HeartbeatThread::operator()() {
+    std::thread(&HeartbeatThread::monitorHeartbeats, this).detach();
     acceptServerConnections();
 }
 
@@ -62,11 +65,43 @@ void HeartbeatThread::handleServer(int heartbeat_socket) {
             std::cerr << "Failed to parse JSON: " << e.what() << "\n";
         }
 
-        // Print the received data
-        std::cout << "Received from client: " << buffer << std::endl;
     }
 
     std::cout << "Stopped handling client connection.\n";
+}
+
+//// 监控心跳状态
+void HeartbeatThread::monitorHeartbeats() {
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::seconds(MONITOR_INTERVAL));
+        auto now = std::chrono::system_clock::now();
+        std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
+
+        auto storeIds = kvStore.getAllStoreIds();
+        for (const auto& storeId : storeIds) {
+            std::tm last_heartbeat_tm = {};
+            std::string lastHeartbeat = kvStore.getLastHeartbeat(storeId);
+            std::istringstream time_stream(lastHeartbeat);
+            time_stream >> std::get_time(&last_heartbeat_tm, "%Y-%m-%d %H:%M:%S");
+
+            if (time_stream.fail()) {
+                std::cerr << "Failed to parse last_heartbeat for storeId: " << storeId << "\n";
+                continue;
+            }
+
+            auto last_heartbeat_time_t = std::mktime(&last_heartbeat_tm);
+            auto last_heartbeat_tp = std::chrono::system_clock::from_time_t(last_heartbeat_time_t);
+
+            if (std::chrono::duration_cast<std::chrono::seconds>(now - last_heartbeat_tp).count() > HEARTBEAT_TIMEOUT) {
+                std::string alive = kvStore.getStoreStatus(storeId);
+                if(alive == "true"){
+                    kvStore.setStoreStatus(storeId,"false");
+                    std::cout << "Set heartbeat of client-" << storeId ;
+                    std::cout << " to " << kvStore.getStoreStatus(storeId) << ".\n";
+                }
+            }
+        }
+    }
 }
 
 void HeartbeatThread::acceptServerConnections() {

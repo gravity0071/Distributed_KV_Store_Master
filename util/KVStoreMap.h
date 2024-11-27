@@ -47,6 +47,8 @@ public:
     std::string getLeftStoreId(const std::string& key) const;
     std::string getRightStoreId(const std::string& key) const;
     std::string getLastHeartbeat(const std::string& key) const;
+    std::vector<std::string> getAllStoreIds();
+
 
     // Setter functions to update individual fields in the JSON structure
     void setIp(const std::string& key, const std::string& ip);

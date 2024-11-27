@@ -162,6 +162,15 @@ std::string KVStoreMap::getLastHeartbeat(const std::string& key) const {
     return "";
 }
 
+std::vector<std::string> KVStoreMap::getAllStoreIds() {
+    std::shared_lock<std::shared_mutex> lock(sharedMutex); // Shared lock for reading
+    std::vector<std::string> storeIds;
+    for (const auto& pair : store) {
+        storeIds.push_back(pair.first);
+    }
+    return storeIds;
+}
+
 // Setter function implementations using updateField
 void KVStoreMap::setIp(const std::string& key, const std::string& ip) {
     updateField(key, "ip", ip);
