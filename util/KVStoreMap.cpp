@@ -150,6 +150,18 @@ std::string KVStoreMap::getRightStoreId(const std::string& key) const {
     return "";
 }
 
+std::string KVStoreMap::getLastHeartbeat(const std::string& key) const {
+    std::shared_lock<std::shared_mutex> lock(sharedMutex); // Shared lock for reading
+    auto data = read(key);
+    if (!data.has_value()) return "";
+
+    auto jsonData = jsonParser.JsonToMap(data.value());
+    if (jsonData.find("lastHeartbeat") != jsonData.end()) {
+        return jsonData["lastHeartbeat"];
+    }
+    return "";
+}
+
 // Setter function implementations using updateField
 void KVStoreMap::setIp(const std::string& key, const std::string& ip) {
     updateField(key, "ip", ip);
@@ -182,8 +194,13 @@ void KVStoreMap::setKeyRange(const std::string& key, const std::string& keyRange
 void KVStoreMap::setLeftStoreId(const std::string& key, const std::string& keyRange) {
     updateField(key, "leftStoreId", keyRange);
 }
+
 void KVStoreMap::setRightStoreId(const std::string& key, const std::string& keyRange) {
     updateField(key, "rightStoreId", keyRange);
+}
+
+void KVStoreMap::setLastHeartbeat(const std::string& key, const std::string& lastHeartbeat) {
+    updateField(key, "lastHeartbeat", lastHeartbeat);
 }
 
 // Function to set all fields at once
