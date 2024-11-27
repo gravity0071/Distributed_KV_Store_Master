@@ -45,8 +45,17 @@ void HeartbeatThread::handleServer(int heartbeat_socket) {
 
                 kvStore.setStoreStatus(storeId,"true");
 
-                std::cout << "Set heartbeat of client: " << storeId ;
+                std::cout << "Set heartbeat of client-" << storeId ;
                 std::cout << " to " << kvStore.getStoreStatus(storeId) << ".\n";
+
+                auto now = std::chrono::system_clock::now();
+                std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
+                std::ostringstream time_stream;
+                time_stream << std::put_time(std::localtime(&now_time_t), "%Y-%m-%d %H:%M:%S");
+                kvStore.setLastHeartbeat(storeId,time_stream.str());
+
+                std::cout << "Set lastHeartbeat of client-" << storeId ;
+                std::cout << " to " << kvStore.getLastHeartbeat(storeId) << ".\n";
 
             }
         } catch (const std::exception& e) {

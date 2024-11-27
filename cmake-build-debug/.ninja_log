@@ -11,3 +11,9 @@
 2222	2325	1731994346003216224	MyExecutable	983d1006c422a37d
 3	4418	1732684989122708753	CMakeFiles/MyExecutable.dir/handleHeartbeat/heartbeatMainFunction.cpp.o	a79305d25f467df4
 4419	4740	1732684989452389102	MyExecutable	983d1006c422a37d
+5	1593	1732687377055264439	CMakeFiles/MyExecutable.dir/handleLocalCommand/localCommandMainFunction.cpp.o	b87fab1d4d8d225
+3	1649	1732687377112302527	CMakeFiles/MyExecutable.dir/main.cpp.o	45ccab56c99ad5c8
+5	2060	1732687377521399916	CMakeFiles/MyExecutable.dir/handleHeartbeat/heartbeatMainFunction.cpp.o	a79305d25f467df4
+5	2077	1732687377539025491	CMakeFiles/MyExecutable.dir/handleClient/clientMainFunction.cpp.o	eaf6597c3cd3b1b5
+4	2107	1732687377569076858	CMakeFiles/MyExecutable.dir/util/KVStoreMap.cpp.o	1f4c5bb3b4bd9120
+2107	2220	1732687377691014503	MyExecutable	983d1006c422a37d
