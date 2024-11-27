@@ -36,6 +36,23 @@ void HeartbeatThread::handleServer(int heartbeat_socket) {
 
         buffer[bytes_read] = '\0'; // Null-terminate the buffer to safely print as a string
 
+        try {
+            auto json_data = nlohmann::json::parse(buffer);
+            std::string operation = json_data["operation"];
+            std::string storeId = json_data["storeId"];
+
+            if (operation == "heartbeat") {
+
+                kvStore.setStoreStatus(storeId,"true");
+
+                std::cout << "Set heartbeat of client: " << storeId ;
+                std::cout << " to " << kvStore.getStoreStatus(storeId) << ".\n";
+
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Failed to parse JSON: " << e.what() << "\n";
+        }
+
         // Print the received data
         std::cout << "Received from client: " << buffer << std::endl;
     }
