@@ -17,6 +17,8 @@ private:
 public:
     void add(const std::string& value);
     std::vector<std::string> getAll() const;
+    bool remove(const std::string& value); // Add remove function
+    bool have(const std::string& val);
 };
 
 #endif // SHARED_STRING_VECTOR_H

@@ -16,12 +16,13 @@ private:
     mutable std::shared_mutex mutex;           // Shared mutex for thread safety
     HashCalculator hashCalculator;             // Hash calculator instance
 
+public:
     // Helper function to parse range keys
     bool parseRange(const std::string& rangeKey, size_t& start, size_t& end) const;
-
-public:
     // Constructor: Allows configuration of hash range
     explicit ConsistentHashingMap(size_t hashRange = HASH_KEY_RANGE) : hashCalculator(hashRange) {}
+    auto begin() { return hashMap.begin(); }
+    auto end() { return hashMap.end(); }
 
     // Find the store_id responsible for a given key
     std::string findParticularKey(const std::string& key) const;
