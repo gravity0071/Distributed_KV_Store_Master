@@ -10,19 +10,19 @@
 
 class ClientThread {
 private:
-    KVStoreMap& kvStore;                 // 用于存储键值映射
-    ConsistentHashingMap& consistentMap; // 用于一致性哈希的映射
-    JsonParser& jsonParser;              // 用于解析和构造 JSON 数据
+    KVStoreMap &kvStore;
+    ConsistentHashingMap &consistentMap;
+    JsonParser &jsonParser;
 
 public:
-    ClientThread(KVStoreMap& kvStore, ConsistentHashingMap& consistentMap, JsonParser& jsonParser)
+    ClientThread(KVStoreMap &kvStore, ConsistentHashingMap &consistentMap, JsonParser &jsonParser)
             : kvStore(kvStore), consistentMap(consistentMap), jsonParser(jsonParser) {}
 
-    void operator()();              // 线程入口
-    void connectToClient();         // 处理客户端连接
-    void handleClient(int clientSocket); // 处理单个客户端请求
-};
+    void operator()();
 
-void initializeHashMap(ConsistentHashingMap& consistentMap);
+    void connectToClient();
+
+    void handleClient(int clientSocket);
+};
 
 #endif // CLIENT_THREAD_H
