@@ -13,48 +13,7 @@
 #include <random>
 #include <thread>
 
-void CommandThread::testAddServerIntoKvStore() {
-    kvStore.setAllFields("store4",          // Key
-                         "127.0.0.1",     // IP
-                         "",            // Heartbeat Port
-                         "8084",            // Add/Drop Port
-                         "8083",            // Client Port
-                         "true",            // Status
-                         "3000",             // KeyNum
-                         "0-3000",           // KeyRange
-                         "store5",          // Left Store ID
-                         "store6"
-    );
-    kvStore.setAllFields("store5",          // Key
-                         "127.0.0.1",     // IP
-                         "",            // Heartbeat Port
-                         "8086",            // Add/Drop Port
-                         "8085",            // Client Port
-                         "true",            // Status
-                         "5000",             // KeyNum
-                         "3000-8000",         // KeyRange
-                         "store6",          // Left Store ID
-                         "store4"           // Right Store ID
-    );
-    kvStore.setAllFields("store6",          // Key
-                         "127.0.0.1",     // IP
-                         "",            // Heartbeat Port
-                         "9094",            // Add/Drop Port
-                         "9095",            // Client Port
-                         "true",            // Status
-                         "2001",             // KeyNum
-                         "8000-10001",         // KeyRange
-                         "store4",          // Left Store ID
-                         "store5"           // Right Store ID
-    );
-    consistentMap.addNew("0-10001", "0-3000", "store1");
-    consistentMap.addNew("0-10001", "8000-10001", "store3");
-    consistentMap.addNew("0-8000", "3000-8000", "store2");
-//    sharedVector.add("store2");
-}
-
 void CommandThread::operator()() {
-//    testAddServerIntoKvStore();
     handleServer();
 }
 
