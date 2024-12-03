@@ -42,7 +42,7 @@ int TcpConnectionUtility::connectToServer(const std::string& serverIp, int serve
 
     // Connect to the server
     if (connect(socketFd, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
-        perror("Connection to server failed");
+//        perror("Connection to server failed");
         close(socketFd);
         return -1;
     }

@@ -28,7 +28,7 @@ void ClientThread::handleClient(int clientSocket) {
         }
 
         buffer[bytesRead] = '\0'; // 确保字符串以 NULL 结尾
-        std::cout << "Received query from client: " << buffer << std::endl;
+//        std::cout << "Received query from client: " << buffer << std::endl;
 
         // 解析客户端请求
         std::map<std::string, std::string> clientRequest = jsonParser.JsonToMap(buffer);

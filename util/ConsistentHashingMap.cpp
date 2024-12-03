@@ -17,7 +17,7 @@ std::string ConsistentHashingMap::findParticularKey(const std::string &key) cons
     std::shared_lock lock(mutex); // Shared lock for reading
 
     size_t hashValue = hashCalculator.calculateHash(key);
-    std::cout << "currently looking for: " <<  hashValue << std::endl;
+//    std::cout << "currently looking for: " <<  hashValue << std::endl;
 
     // Iterate through the hashMap to find the responsible range
     for (const auto &[rangeKey, storeId] : hashMap) {
