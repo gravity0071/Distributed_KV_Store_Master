@@ -93,7 +93,7 @@ int CommandThread::removeServer() {
         std::cerr << "only have one kv_store server, cannot remove" << std::endl;
         return 0;
     }
-//    kvStore.displayAllKeys();
+    kvStore.displayAllKeys();
     std::cout << "type in the server you want to drop, exit type -1" << std::endl;
 
     while (true) {
