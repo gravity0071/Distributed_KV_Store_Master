@@ -12,7 +12,7 @@ Server::~Server() {
 
 bool Server::initialize() {
     if ((server_fd_ = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
-        perror("Socket creation failed");
+//        perror("Socket creation failed");
         return false;
     }
 
