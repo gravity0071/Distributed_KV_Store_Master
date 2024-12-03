@@ -5,7 +5,12 @@
 #include "../util/ConsistentHashingMap.h"
 #include "../util/SharedStringVector.h"
 #include "../util/TcpConnectionUtility.h"
-#define COMMAND_PORT 8082
+
+#define MASTER_IP "127.0.0.1"
+#define INITATE_COMMAND_ADDRESS "/Users/shawnwan/Documents/cpp/Distributed_KV_Store_Server/build/MyExecutable" // store_test 127.0.0.1 8081
+#define HEARTBEAT_PORT "8081"
+#define KV_STORE_SERVER_IP "127.0.0.1"
+#define HASH_KEY_RANGE 10000
 
 class CommandThread {
 private:
@@ -19,6 +24,11 @@ private:
     int migratingStoreSocketRecv = -1;
     std::string sourceServerId = "-1";
     std::string destServerId = "-1";
+
+    int newServerClientPort = -1;
+    int newServerCommandPort = -1;
+    std::string newServerId = "";
+    std::string movingKeyRange = "";
 
 public:
     CommandThread(KVStoreMap &kvStore, ConsistentHashingMap &consistentMap, JsonParser &jsonParser,
@@ -38,10 +48,10 @@ public:
 
     void testAddServerIntoKvStore();
 
-    std::string checkWhichServerValidRemoving(std::string &leftAdjacent,
-                                              std::string &rightAdjacent); //return the valid server when removing
-    int buildConnect(std::string &server1,
-                     std::string &server2); //build tcp connection to two servers and bind them to migratingStoreSocket1,2
+    std::string checkWhichServerValidRemoving(std::string &leftAdjacent, std::string &rightAdjacent);
+    std::string checkWhichServerMoveFrom();
+
+    int buildConnect(std::string &server1, std::string &server2); //build tcp connection to two servers and bind them to migratingStoreSocket1,2
     //data flow:  1->2
 
     void closeAllConnection();
@@ -59,6 +69,10 @@ public:
     int sendIpPorttoRecv(std::string &sourceIp, int sourcePort);
 
     int receiveData(int clientSocket, std::string &receivedData);
+
+    void operationAfterRemovingOrAdding(bool isAdd);
+
+    int startNewServerAndSetNewPortsintoTmp(bool isTheFirstServer);
 };
 
 #endif // COMMAND_THREAD_H

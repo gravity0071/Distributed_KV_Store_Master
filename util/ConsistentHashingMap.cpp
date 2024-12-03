@@ -23,6 +23,8 @@ std::string ConsistentHashingMap::findParticularKey(const std::string &key) cons
     for (const auto &[rangeKey, storeId] : hashMap) {
         size_t start, end;
         if (parseRange(rangeKey, start, end)) {
+            if(start == end) //only have one store and it contains all the possible keys
+                return storeId;
             if ((start < end && hashValue >= start && hashValue < end) || // Standard range
                 (start > end && (hashValue >= start || hashValue < end))) { // Wraparound range
                 return storeId;
@@ -38,7 +40,7 @@ int ConsistentHashingMap::addNew(const std::string &oldRange, const std::string 
     std::unique_lock lock(mutex); // Exclusive lock for writing
 
     if (hashMap.empty()) {
-        std::string fullRange = "0-" + std::to_string(HASH_KEY_RANGE + 1);
+        std::string fullRange = "0-" + std::to_string(HASH_KEY_RANGE);
         hashMap[fullRange] = storeId; // Assign the full range to the store
 //        std::cout << "Map is empty. Assigned the full range: " << fullRange << " to store: " << storeId << std::endl;
         return HASH_KEY_RANGE; // Return the hash key range
@@ -69,10 +71,10 @@ int ConsistentHashingMap::addNew(const std::string &oldRange, const std::string 
     hashMap.erase(old_it);
 
     // Adjust the old range to exclude the new range
-    if (newStart == oldStart) {
+    if (newStart == oldStart % HASH_KEY_RANGE) {
         // New range starts where the old range starts
         hashMap[std::to_string(newEnd) + "-" + std::to_string(oldEnd)] = old_id;
-    } else if (newEnd == oldEnd) {
+    } else if (newEnd == oldEnd % HASH_KEY_RANGE) {
         // New range ends where the old range ends
         hashMap[std::to_string(oldStart) + "-" + std::to_string(newStart)] = old_id;
     } else {
@@ -106,21 +108,21 @@ int ConsistentHashingMap::removeRange(const std::string &oldRange, const std::st
     // Check adjacency or wraparound
     bool isAdjacent = (oldEnd == newStart) || (oldStart == newEnd);
     size_t combinedStart, combinedEnd;
-    if(oldEnd == newStart || (oldEnd == HASH_KEY_RANGE + 1 && newStart == 0)){
+    if(oldEnd == newStart || (oldEnd == HASH_KEY_RANGE && newStart == 0)){
         combinedStart = oldStart;
         combinedEnd = newEnd;
     }else{
         combinedStart = newStart;
         combinedEnd = oldEnd;
     }
-    std::string storeId = old_it->second; // Retain the store ID from the old range
+    std::string storeId = new_it->second; // Retain the store ID from the old range
 
     // Remove old and new ranges from the map
     hashMap.erase(old_it);
     hashMap.erase(new_it);
 
     // Add the combined range
-    std::string combinedRange = std::to_string(combinedStart) + "-" + std::to_string(combinedEnd);
+    std::string combinedRange = std::to_string(combinedStart % HASH_KEY_RANGE) + "-" + std::to_string(combinedEnd % HASH_KEY_RANGE);
     auto result = hashMap.emplace(combinedRange, storeId);
 
     if (!result.second) {

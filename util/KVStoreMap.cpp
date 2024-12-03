@@ -236,3 +236,32 @@ bool KVStoreMap::haveKey(std::string& val) const{
         return true;
     return false;
 }
+
+void KVStoreMap::deleteData(const std::string& key){
+    std::unique_lock<std::shared_mutex> lock(sharedMutex);
+    store.erase(key);
+}
+
+std::string KVStoreMap::getKeyWithMaxKeyNum() const {
+    if(store.size() == 0)
+        return "";
+    std::shared_lock<std::shared_mutex> lock(sharedMutex); // Shared lock for reading
+
+    std::string maxKey;
+    int maxKeyNum = INT_MIN;
+
+    for (const auto& [key, value] : store) {
+        // Parse the JSON data for the keyNum field
+        auto jsonData = jsonParser.JsonToMap(value);
+        if (jsonData.find("keyNum") != jsonData.end()) {
+            if(jsonData["keyNum"] == "")continue;
+            int keyNum = std::stoi(jsonData["keyNum"]);
+            if (keyNum > maxKeyNum) {
+                maxKeyNum = keyNum;
+                maxKey = key;
+            }
+        }
+    }
+
+    return maxKey; // Return the key with the maximum keyNum
+}

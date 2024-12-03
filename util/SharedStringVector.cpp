@@ -7,7 +7,7 @@
 void SharedStringVector::add(const std::string& value) {
     std::unique_lock lock(mutex);
     vec.push_back(value);
-    std::cout << "SharedStringVector: Added " << value << std::endl;
+//    std::cout << "SharedStringVector: Added " << value << std::endl;
 }
 
 std::vector<std::string> SharedStringVector::getAll() const {
@@ -30,10 +30,9 @@ bool SharedStringVector::remove(const std::string& value) {
     auto it = std::find(vec.begin(), vec.end(), value);
     if (it != vec.end()) {
         vec.erase(it); // Remove the element if found
-        std::cout << "SharedStringVector: Removed " << value << std::endl;
-        return true;
+//        std::cout << "SharedStringVector: Removed " << value << std::endl;
     } else {
-        std::cout << "SharedStringVector: Value " << value << " not found" << std::endl;
-        return false;
+        std::cerr << "SharedStringVector: Value " << value << " not found" << std::endl;
     }
+    return true;
 }

@@ -1,4 +1,3 @@
-// util/server.cpp
 #include "Server.h"
 
 Server::Server(int port) : port_(port), server_fd_(-1), addrlen_(sizeof(address_)) {
@@ -30,10 +29,18 @@ bool Server::initialize() {
     }
 #endif
 
-    if (bind(server_fd_, (struct sockaddr *)&address_, sizeof(address_)) < 0) {
+    if (bind(server_fd_, (struct sockaddr *) &address_, sizeof(address_)) < 0) {
         perror("Bind failed");
         return false;
     }
+
+    // 获取分配的端口号
+    socklen_t len = sizeof(address_);
+    if (getsockname(server_fd_, (struct sockaddr *)&address_, &len) == -1) {
+        perror("getsockname failed");
+        return false;
+    }
+    port_ = ntohs(address_.sin_port);
 
     if (listen(server_fd_, 3) < 0) {
         perror("Listen failed");
@@ -41,28 +48,32 @@ bool Server::initialize() {
     }
 
 //    std::cout << "Server is listening on port " << port_ << std::endl;
-//    std::cout << port_  <<std::endl;
     return true;
-}
-
-int Server::acceptConnection() {
-    int new_socket;
-    if ((new_socket = accept(server_fd_, (struct sockaddr *)&address_, (socklen_t *)&addrlen_)) < 0) {
-        perror("Accept failed");
-        return -1;
-    }
-    std::cout << "Accepted new connection on port" << port_ << std::endl;
-    return new_socket;
 }
 
 void Server::closeConnection(int client_socket) {
     close(client_socket);
-    std::cout << "Closed connection with client on port" << port_ << std::endl;
+//    std::cout << "Closed connection with client on port " << port_ << std::endl;
 }
 
 void Server::closeServer() {
     if (server_fd_ != -1) {
         close(server_fd_);
-        std::cout << "Closed server on port " << port_ << std::endl;
+        server_fd_ = -1;
+//        std::cout << "Closed server on port " << port_ << std::endl;
     }
+}
+
+int Server::acceptConnection() {
+    int new_socket;
+    if ((new_socket = accept(server_fd_, (struct sockaddr *) &address_, (socklen_t *) &addrlen_)) < 0) {
+        perror("Accept failed");
+        return -1;
+    }
+//    std::cout << "Accepted new connection on port " << port_ << std::endl;
+    return new_socket;
+}
+
+int Server::getAssignedPort() const {
+    return port_;
 }
