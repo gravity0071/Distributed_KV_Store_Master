@@ -22,6 +22,7 @@ public:
 
     void closeServer();
 
+    int getAssignedPort() const;
 private:
     int port_;                 // Port number the server listens on.
     int server_fd_;            // Server socket file descriptor.
