@@ -16,10 +16,11 @@ Value:
   "addDropPort":"",
   "clientPort":"",
   "alive":"true"/"false",
-  ¡°keyNum":""£¬
-  ¡°keyRange": "",
+  ï¿½ï¿½keyNum":""ï¿½ï¿½
+  ï¿½ï¿½keyRange": "",
   "leftStoreId": "",
   "rightStoreId": ""
+  "lastHeartbeat: "%Y-%m-%d %H:%M:%S"
 }
  */
 
@@ -62,6 +63,10 @@ public:
     std::string getLeftStoreId(const std::string &key) const;
 
     std::string getRightStoreId(const std::string &key) const;
+  
+    std::string getLastHeartbeat(const std::string& key) const;
+  
+    std::vector<std::string> getAllStoreIds();
 
     // Setter functions to update individual fields in the JSON structure
     void setIp(const std::string &key, const std::string &ip);
@@ -81,6 +86,8 @@ public:
     void setLeftStoreId(const std::string &key, const std::string &leftStore);
 
     void setRightStoreId(const std::string &key, const std::string &rigthStore);
+  
+    void setLastHeartbeat(const std::string& key, const std::string& lastHeartbeat);
 
     // Function to set all fields at once
     void setAllFields(const std::string &key, const std::string &ip, const std::string &heartbeatPort,
