@@ -12,8 +12,18 @@
 #define HEARTBEAT_TIMEOUT 5 // 心跳超时时间（秒）
 #define MONITOR_INTERVAL 2 // 监控线程检查间隔（秒）
 
+std::mutex HeartbeatThread::monitorMutex;
+bool HeartbeatThread::isMonitoring = false;
+
 void HeartbeatThread::operator()() {
-    std::thread(&HeartbeatThread::monitorHeartbeats, this).detach();
+//    std::thread(&HeartbeatThread::monitorHeartbeats, this).detach();
+    {
+        std::lock_guard<std::mutex> lock(monitorMutex);
+        if (!isMonitoring) {
+            isMonitoring = true;
+            std::thread(&HeartbeatThread::monitorHeartbeats, this).detach();
+        }
+    }
     acceptServerConnections();
 }
 
@@ -70,7 +80,7 @@ void HeartbeatThread::handleServer(int heartbeat_socket) {
     std::cout << "Stopped handling client connection.\n";
 }
 
-//// 监控心跳状态
+//// monitor heartbeat status
 void HeartbeatThread::monitorHeartbeats() {
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(MONITOR_INTERVAL));
@@ -115,7 +125,7 @@ void HeartbeatThread::acceptServerConnections() {
 
     std::vector<std::thread> heartBeat_threads;
 
-    while (true) {
+    while (true ) {
         // Accept a new client connection
         int heartbeat_socket = server.acceptConnection();
         if (heartbeat_socket < 0) {

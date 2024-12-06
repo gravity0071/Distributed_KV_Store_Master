@@ -13,7 +13,9 @@ private:
     ConsistentHashingMap& consistentMap;
     SharedStringVector& sharedVector;
     JsonParser& jsonParser;
-
+    void monitorHeartbeats();
+    static std::mutex monitorMutex;
+    static bool isMonitoring;
 
 public:
     HeartbeatThread(KVStoreMap& kvStore, ConsistentHashingMap& consistentMap, JsonParser& jsonParser, SharedStringVector& sharedVector)
@@ -22,7 +24,6 @@ public:
     void operator()();
     void acceptServerConnections();
     void handleServer(int heartbeat_socket);
-    void monitorHeartbeats(); // 新增监控线程函数
 };
 
 #endif // HEARTBEAT_THREAD_H
