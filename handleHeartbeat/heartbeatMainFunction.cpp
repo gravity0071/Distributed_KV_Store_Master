@@ -125,7 +125,7 @@ void HeartbeatThread::acceptServerConnections() {
 
     std::vector<std::thread> heartBeat_threads;
 
-    while (true ) {
+    while (true) {
         // Accept a new client connection
         int heartbeat_socket = server.acceptConnection();
         if (heartbeat_socket < 0) {

@@ -25,7 +25,7 @@ int TcpConnectionUtility::connectToServer(const std::string& serverIp, int serve
             return -1;
         }
 
-        std::cout << "Bound to local port " << localPort << std::endl;
+//        std::cout << "Bound to local port " << localPort << std::endl;
     }
 
     // Set up the remote server address
@@ -42,11 +42,11 @@ int TcpConnectionUtility::connectToServer(const std::string& serverIp, int serve
 
     // Connect to the server
     if (connect(socketFd, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
-        perror("Connection to server failed");
+//        perror("Connection to server failed");
         close(socketFd);
         return -1;
     }
 
-    std::cout << "Connected to server at " << serverIp << ":" << serverPort << std::endl;
+//    std::cout << "Connected to server at " << serverIp << ":" << serverPort << std::endl;
     return socketFd;
 }

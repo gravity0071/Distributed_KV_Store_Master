@@ -3,6 +3,10 @@
 #include <map>
 #include <shared_mutex>
 
+int KVStoreMap::size(){
+    return store.size();
+}
+
 // Function to write a key-value pair to the store
 void KVStoreMap::write(const std::string& key, const std::string& value) {
     std::unique_lock<std::shared_mutex> lock(sharedMutex); // Exclusive lock for writing
@@ -233,10 +237,57 @@ void KVStoreMap::setAllFields(const std::string& key, const std::string& ip, con
 }
 
 void KVStoreMap::displayAllData() const {
-    std::shared_lock lock(sharedMutex); // Shared lock for reading
+    std::shared_lock lock(sharedMutex);
 
     std::cout << "display kv store map:" << std::endl;
     for (const auto &[Key, val] : store) {
         std::cout << "key: " << Key << " -> Store Data: " << val << std::endl;
     }
+}
+
+void KVStoreMap::displayAllKeys() const{
+    std::shared_lock lock(sharedMutex);
+    std::cout << "Servers: ";
+    for (const auto &[Key, val] : store) {
+        std::cout << Key << ", ";
+    }
+    std::cout << std::endl;
+}
+
+bool KVStoreMap::haveKey(std::string& val) const{
+    std::shared_lock lock(sharedMutex);
+
+    auto it = store.find(val);
+    if(it != store.end())
+        return true;
+    return false;
+}
+
+void KVStoreMap::deleteData(const std::string& key){
+    std::unique_lock<std::shared_mutex> lock(sharedMutex);
+    store.erase(key);
+}
+
+std::string KVStoreMap::getKeyWithMaxKeyNum() const {
+    if(store.size() == 0)
+        return "";
+    std::shared_lock<std::shared_mutex> lock(sharedMutex); // Shared lock for reading
+
+    std::string maxKey;
+    int maxKeyNum = INT_MIN;
+
+    for (const auto& [key, value] : store) {
+        // Parse the JSON data for the keyNum field
+        auto jsonData = jsonParser.JsonToMap(value);
+        if (jsonData.find("keyNum") != jsonData.end()) {
+            if(jsonData["keyNum"] == "")continue;
+            int keyNum = std::stoi(jsonData["keyNum"]);
+            if (keyNum > maxKeyNum) {
+                maxKeyNum = keyNum;
+                maxKey = key;
+            }
+        }
+    }
+
+    return maxKey; // Return the key with the maximum keyNum
 }
