@@ -556,6 +556,13 @@ int CommandThread::startNewServerAndSetNewPortsintoTmp(bool isTheFirstServer) {
 
     kvStore.setAllFields(newServerId, KV_STORE_SERVER_IP, "", std::to_string(newServerCommandPort),
                          std::to_string(newServerClientPort), status, keyNum, keyRange, leftStoreId, rightStoreId);
+
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
+    std::ostringstream time_stream;
+    time_stream << std::put_time(std::localtime(&now_time_t), "%Y-%m-%d %H:%M:%S");
+    kvStore.setLastHeartbeat(newServerId,time_stream.str());
+
     if (isTheFirstServer)
         consistentMap.addNew("0-0", "0-10000", newServerId);
     return 1;
