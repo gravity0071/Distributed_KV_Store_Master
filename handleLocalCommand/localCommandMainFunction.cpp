@@ -181,7 +181,7 @@ std::string CommandThread::checkWhichServerValidRemoving(std::string &leftAdjace
     else {
         int leftServerKeyNum = std::stoi(kvStore.getStoreKeyNum(leftAdjacent));
         int rightServerKeyNum = std::stoi(kvStore.getStoreKeyNum(rightAdjacent));
-        return leftServerKeyNum > rightServerKeyNum ?  rightAdjacent : leftAdjacent;
+        return leftServerKeyNum > rightServerKeyNum ? rightAdjacent : leftAdjacent;
     }
 }
 
@@ -377,7 +377,7 @@ int CommandThread::handleReceiveServer() {
     std::string finishResp = jsonParser.MapToJson(finishMap);
     send(migratingStoreSocketRecv, finishResp.c_str(), finishResp.size(), 0);
     finishResp = "";
-    if(!receiveData(migratingStoreSocketRecv, finishResp)){
+    if (!receiveData(migratingStoreSocketRecv, finishResp)) {
         std::cerr << "fuck it" << std::endl;
     }
     return 1;
@@ -552,7 +552,7 @@ int CommandThread::startNewServerAndSetNewPortsintoTmp(bool isTheFirstServer) {
     std::string keyRange = isTheFirstServer ? "0-" + std::to_string(HASH_KEY_RANGE) : "";
     std::string leftStoreId = isTheFirstServer ? newServerId : "";
     std::string rightStoreId = isTheFirstServer ? newServerId : "";
-    std::string status = isTheFirstServer ? "true" : "false";
+    std::string status = "true";
 
     kvStore.setAllFields(newServerId, KV_STORE_SERVER_IP, "", std::to_string(newServerCommandPort),
                          std::to_string(newServerClientPort), status, keyNum, keyRange, leftStoreId, rightStoreId);
@@ -561,7 +561,7 @@ int CommandThread::startNewServerAndSetNewPortsintoTmp(bool isTheFirstServer) {
     std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
     std::ostringstream time_stream;
     time_stream << std::put_time(std::localtime(&now_time_t), "%Y-%m-%d %H:%M:%S");
-    kvStore.setLastHeartbeat(newServerId,time_stream.str());
+    kvStore.setLastHeartbeat(newServerId, time_stream.str());
 
     if (isTheFirstServer)
         consistentMap.addNew("0-0", "0-10000", newServerId);

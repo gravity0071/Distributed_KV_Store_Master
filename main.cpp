@@ -16,6 +16,10 @@ int main() {
     JsonParser jsonParser;
     TcpConnectionUtility tcpConnectionUtility;
 
+    //8081
+    HeartbeatThread heartbeatThread(kvStore, consistentMap, jsonParser, sharedVector);
+    //    std::this_thread::sleep_for(std::chrono::seconds(2)); // wait the master for the heartbeat thread finishing creating
+
     {
         CommandThread CommandThread1(kvStore, consistentMap, jsonParser, sharedVector);
         int times = 10;
@@ -35,8 +39,6 @@ int main() {
     //jsonParser: convert map to string or string to map
     ClientThread clientThread(kvStore, consistentMap, jsonParser);
 
-    //8081
-    HeartbeatThread heartbeatThread(kvStore, consistentMap, jsonParser, sharedVector);
 
     // 8082
     CommandThread commandThread(kvStore, consistentMap, jsonParser, sharedVector); //8082

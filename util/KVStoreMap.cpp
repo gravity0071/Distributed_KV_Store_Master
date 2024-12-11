@@ -193,6 +193,8 @@ void KVStoreMap::setClientPort(const std::string& key, const std::string& port) 
 }
 
 void KVStoreMap::setStoreStatus(const std::string& key, const std::string& status) {
+    if(store.find(key) == store.end())
+        return;
     updateField(key, "alive", status);
 }
 
@@ -213,6 +215,8 @@ void KVStoreMap::setRightStoreId(const std::string& key, const std::string& keyR
 }
 
 void KVStoreMap::setLastHeartbeat(const std::string& key, const std::string& lastHeartbeat) {
+    if(store.find(key) == store.end())
+        return;
     updateField(key, "lastHeartbeat", lastHeartbeat);
 }
 

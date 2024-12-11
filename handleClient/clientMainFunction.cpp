@@ -17,7 +17,7 @@ void ClientThread::handleClient(int clientSocket) {
         char buffer[1024] = {0};
         int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
         if (bytesRead <= 0) {
-            std::cerr << "Failed to receive data from client or client disconnected." << std::endl;
+//            std::cerr << "Failed to receive data from client or client disconnected." << std::endl;
             break;
         }
 
@@ -51,7 +51,7 @@ void ClientThread::handleClient(int clientSocket) {
                                                                             {"port",     port}
                                                                     });
                     send(clientSocket, jsonResponse.c_str(), jsonResponse.size(), 0);
-                    std::cout << "Sent response to client: " << jsonResponse << std::endl;
+//                    std::cout << "Sent response to client: " << jsonResponse << std::endl;
                 } else {
                     std::string errorResponse = jsonParser.MapToJson({
                                                                              {"error",    "Store is not alive"},
@@ -64,7 +64,7 @@ void ClientThread::handleClient(int clientSocket) {
                 send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
             }
         } else if (operation == "exit") {
-            std::cout << "Client requested to exit." << std::endl;
+//            std::cout << "Client requested to exit." << std::endl;
             break;
         } else {
             std::string errorResponse = jsonParser.MapToJson({{"error", "Unsupported operation"}});
@@ -73,7 +73,7 @@ void ClientThread::handleClient(int clientSocket) {
     }
 
     close(clientSocket);
-    std::cout << "Connection with client closed." << std::endl;
+//    std::cout << "Connection with client closed." << std::endl;
 }
 
 void ClientThread::connectToClient() {
@@ -93,7 +93,7 @@ void ClientThread::connectToClient() {
             continue;
         }
 
-        std::cout << "Accepted new client connection." << std::endl;
+//        std::cout << "Accepted new client connection." << std::endl;
 
         clientThreads.emplace_back(&ClientThread::handleClient, this, clientSocket);
     }

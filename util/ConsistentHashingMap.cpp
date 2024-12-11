@@ -71,10 +71,10 @@ int ConsistentHashingMap::addNew(const std::string &oldRange, const std::string 
     hashMap.erase(old_it);
 
     // Adjust the old range to exclude the new range
-    if (newStart == oldStart % HASH_KEY_RANGE) {
+    if (newStart % HASH_KEY_RANGE == oldStart % HASH_KEY_RANGE) {
         // New range starts where the old range starts
         hashMap[std::to_string(newEnd) + "-" + std::to_string(oldEnd)] = old_id;
-    } else if (newEnd == oldEnd % HASH_KEY_RANGE) {
+    } else if (newEnd % HASH_KEY_RANGE == oldEnd % HASH_KEY_RANGE) {
         // New range ends where the old range ends
         hashMap[std::to_string(oldStart) + "-" + std::to_string(newStart)] = old_id;
     } else {
@@ -108,7 +108,7 @@ int ConsistentHashingMap::removeRange(const std::string &oldRange, const std::st
     // Check adjacency or wraparound
     bool isAdjacent = (oldEnd == newStart) || (oldStart == newEnd);
     size_t combinedStart, combinedEnd;
-    if(oldEnd == newStart || (oldEnd == HASH_KEY_RANGE && newStart == 0)){
+    if(oldEnd == newStart || (oldEnd == HASH_KEY_RANGE && (newStart == 0 || newStart == HASH_KEY_RANGE))){
         combinedStart = oldStart;
         combinedEnd = newEnd;
     }else{
